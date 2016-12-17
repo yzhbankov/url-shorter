@@ -4,8 +4,14 @@
 var express = require('express');
 var app = express();
 
+app.use(express.static('public'));
 app.get('/', function (req, res) {
-    res.send('hello world');
+    res.sendFile(__dirname + '/public');
+});
+
+app.get('/new/:url?', function (req, res) {
+
+    res.send(req.params.url);
 });
 
 app.listen(8080, function () {
