@@ -4,6 +4,7 @@
 var express = require('express');
 var app = express();
 var shortid = require('shortid');
+var validUrl = require('valid-url');
 var MongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017/url-shorter';
 
@@ -13,33 +14,36 @@ app.get('/', function (req, res) {
 });
 
 app.get(/\/new\/.+/, function (req, res) {
-    var shorter_id = shortid.generate();
-    var natural_id = req.path.replace(/\/new\//, "");
-    MongoClient.connect(url, function (err, db) {
-        console.log("Connected correctly to server");
-        db.collection('shorturl').insertOne({
-            "natural_url": natural_id,
-            "short_url": shorter_id
-        }, function (err, result) {
-            if (!err) {
-                console.log("inserted successfuly");
-            }
+    var short_url = shortid.generate();
+    var original_url = req.path.replace(/\/new\//, "");
+    if (validUrl.isUri(original_url)) {
+        MongoClient.connect(url, function (err, db) {
+            db.collection('shorturl').insertOne({
+                "original_url": original_url,
+                "short_url": short_url
+            }, function (err, result) {
+                if (!err) {
+                    console.log("inserted successfuly");
+                }
+            });
+            db.close();
         });
-        db.close();
-    });
-    res.send({
-        "original_url": natural_id,
-        "short_url": shorter_id
-    });
+        res.send({
+            "original_url": original_url,
+            "short_url": short_url
+        })
+    } else {
+        res.send("invalid url format");
+    }
 });
 
-app.get('/get/:id', function (req, res) {
+app.get('/:id', function (req, res) {
     console.log(req.params.id);
     MongoClient.connect(url, function (err, db) {
         db.collection('shorturl').findOne({
             "short_url": req.params.id
         }, function (err, result) {
-            res.redirect(result.natural_url);
+            res.redirect(result.original_url);
         });
         db.close();
     });
