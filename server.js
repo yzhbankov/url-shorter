@@ -6,7 +6,7 @@ var app = express();
 var shortid = require('shortid');
 var validUrl = require('valid-url');
 var MongoClient = require('mongodb').MongoClient;
-var url = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/url-shorter';
+var url = 'mongodb://yzhbankov:password1360@ds135798.mlab.com:35798/heroku_4np3mkvf';
 
 app.use(express.static('public'));
 app.get('/', function (req, res) {
