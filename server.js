@@ -30,7 +30,7 @@ app.get(/\/new\/.+/, function (req, res) {
         });
         res.send({
             "original_url": original_url,
-            "short_url": short_url
+            "short_url": "https://url-short-microservice.herokuapp.com/" + short_url
         })
     } else {
         res.send("invalid url format");
