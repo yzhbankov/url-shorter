@@ -6,7 +6,7 @@ var app = express();
 var shortid = require('shortid');
 var validUrl = require('valid-url');
 var MongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://localhost:27017/url-shorter';
+var url = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/url-shorter';
 
 app.use(express.static('public'));
 app.get('/', function (req, res) {
@@ -55,5 +55,5 @@ app.get('/:id', function (req, res) {
 });
 
 app.listen(process.env.PORT || 3000, function () {
-    console.log('Ready. Listening port 8080');
+    console.log('Ready. Listening port 3000');
 });
