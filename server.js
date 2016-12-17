@@ -12,12 +12,15 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/public');
 });
 
-app.get('/new/:url?', function (req, res) {
+app.get(/\/new\/.+/, function (req, res) {
     var shorter_id = shortid.generate();
+    var natural_id = req.path.replace(/\/new\//, "");
     MongoClient.connect(url, function (err, db) {
         console.log("Connected correctly to server");
-
-        db.collection('shorturl').insertOne({"natural_url": req.params.url, "short_url": shorter_id}, function (err, result) {
+        db.collection('shorturl').insertOne({
+            "natural_url": natural_id,
+            "short_url": shorter_id
+        }, function (err, result) {
             if (!err) {
                 console.log("inserted successfuly");
             }
@@ -25,17 +28,18 @@ app.get('/new/:url?', function (req, res) {
         db.close();
     });
     res.send({
-        "original_url": req.params.url,
+        "original_url": natural_id,
         "short_url": shorter_id
     });
 });
+
 app.get('/get/:id', function (req, res) {
     console.log(req.params.id);
     MongoClient.connect(url, function (err, db) {
         db.collection('shorturl').findOne({
             "short_url": req.params.id
         }, function (err, result) {
-            res.send(result);
+            res.redirect(result.natural_url);
         });
         db.close();
     });
