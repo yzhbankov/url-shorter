@@ -43,7 +43,11 @@ app.get('/:id', function (req, res) {
         db.collection('shorturl').findOne({
             "short_url": req.params.id
         }, function (err, result) {
-            res.redirect(result.original_url);
+            if (!result) {
+                res.send({'error': "not found such url in the database"});
+            } else {
+                res.redirect(result.original_url);
+            }
         });
         db.close();
     });
